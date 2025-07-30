@@ -52,7 +52,27 @@ def homo(arr):
     rotated = arr @ matrix.T
     return rotated
 
-
+def pinhole(arr):
+    f = 1
+    K = np.array([
+        [f,0,0,0],
+        [0,f,0,0],
+        [0,0,1,0]
+    ])
+    
+    twoD = arr @ K.T
+    
+    projected_2d = []
+    for coordinate in twoD:
+        xP,yP,w = coordinate
+        if w > 0:
+            x = xP/w
+            y = yP/w
+            projected_2d.append([x,y])
+        else:
+            projected_2d.append([np.nan,np.nan])
+            
+    return np.array(projected_2d)
 
 
 def plotcubetemp():
@@ -105,6 +125,24 @@ def plotcube():
 
     plt.show()
     
+def plotpinhole(arr):
+    plt.figure()
+    plt.scatter(arr[:, 0], arr[:, 1], color='red')
+    
+    for start, end in edges:
+        x_coords = [arr[start][0], arr[end][0]]
+        y_coords = [arr[start][1], arr[end][1]]
+        if not np.isnan(x_coords).any() and not np.isnan(y_coords).any():
+            plt.plot(x_coords, y_coords, color='blue')
+            
+    plt.gca().set_aspect('equal')
+    plt.xlabel("x")
+    plt.ylabel("y")
+    plt.title("2D Pinhole Projection of 3D Cube")
+    plt.grid(True)
+    plt.show()
+    
+    
 plotcubetemp()
         
 # scale(cube_points, 3)
@@ -133,6 +171,10 @@ plotcubetemp()
 
 # cube_points += [1,1,1]
 
-cube_points = homo(cube_points)
+# cube_points = homo(cube_points)
 
-plotcube()
+# plotcubetemp()
+
+projected = pinhole(cube_points)
+
+plotpinhole(projected)
